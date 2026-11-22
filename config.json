@@ -3,7 +3,7 @@
     "serverName": "« Group |  EXPLOSIVE 971 »",
     "template": "أهلاً بك {user} في سيرفر {server}!",
     "subtext": "نورتنا",
-    "dm": "تو ما نور السيرفر",
+    "dm": "{user} تو ما نور السيرفر",
     "color": "#FF8C00",
     "channelId": "1549392045196574731",
     "image": "welcome.gif",
