@@ -138,12 +138,22 @@ process.on('SIGTERM', () => {
   process.exit(0);
 });
 
+client.on(Events.Error, (err) => console.error('[!] خطأ في الاتصال:', err.message));
+
 const token = String(process.env.DISCORD_TOKEN || '').trim();
 if (!token) {
   console.error('[!] DISCORD_TOKEN غير مضبوط');
-  process.exit(1);
+} else {
+  // ما نخرج من العملية إذا فشل الدخول — خادم الصحة يبقى شغال، ونعيد المحاولة
+  // تلقائياً لين يفعّل صاحب البوت صلاحية Server Members من بوابة المطوّرين
+  async function startLogin() {
+    try {
+      await client.login(token);
+      console.log('[✓] تم تسجيل الدخول بنجاح');
+    } catch (err) {
+      console.error('[!] فشل تسجيل الدخول (' + err.message + ') — إعادة المحاولة خلال 30 ثانية...');
+      setTimeout(startLogin, 30000);
+    }
+  }
+  startLogin();
 }
-client.login(token).catch((err) => {
-  console.error('[!] فشل تسجيل الدخول:', err.message);
-  process.exit(1);
-});
