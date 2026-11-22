@@ -1,0 +1,13 @@
+{
+  "1546676470053601462": {
+    "serverName": "« Group |  EXPLOSIVE 971 »",
+    "template": "أهلاً بك {user} في سيرفر {server}!",
+    "subtext": "نورتنا",
+    "dm": "تو ما نور السيرفر",
+    "color": "#FF8C00",
+    "channelId": null,
+    "image": "welcome.gif",
+    "welcomeEnabled": true,
+    "dmEnabled": true
+  }
+}
