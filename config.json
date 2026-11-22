@@ -1,7 +1,7 @@
 {
   "1546676470053601462": {
     "serverName": "« Group |  EXPLOSIVE 971 »",
-    "template": "أهلاً بك {user} في سيرفر {server}!",
+    "template": "{user}  {server}تو ما نور",
     "subtext": "نورتنا",
     "dm": "{user} تو ما نور السيرفر",
     "color": "DC143C",
