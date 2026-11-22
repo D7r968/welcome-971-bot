@@ -67,7 +67,8 @@ const DEFAULTS = {
   channelId: null,
   image: 'welcome.gif',
   welcomeEnabled: true,
-  dmEnabled: true
+  dmEnabled: true,
+  dmImageEnabled: true
 };
 
 function readLocalJson(file) {
@@ -246,7 +247,9 @@ async function welcomeMember(member) {
 
   if (!cfg.dmEnabled) return;
   try {
-    await member.send({ content: built.dm, files: [fileFor(cfg)] });
+    const dmPayload = { content: built.dm };
+    if (cfg.dmImageEnabled) dmPayload.files = [fileFor(cfg)];
+    await member.send(dmPayload);
     console.log(`[✓] أرسلت رسالة الخاص لـ ${member.user.tag}`);
   } catch (err) {
     console.warn(`[i] ما وصلت رسالة الخاص لـ ${member.user.tag}: ${err.message}`);
@@ -265,6 +268,9 @@ function buildCommands() {
 
     .addSubcommand((s) => s.setName('dm').setDescription('عدّل رسالة الخاص')
       .addStringOption((o) => o.setName('text').setDescription('نص الخاص — يدعم {user} و {server}').setRequired(true)))
+
+    .addSubcommand((s) => s.setName('dmimage').setDescription('فعّل أو عطّل الصورة في رسالة الخاص')
+      .addBooleanOption((o) => o.setName('enabled').setDescription('true = الصورة تجي مع الخاص / false = بدون صورة').setRequired(true)))
 
     .addSubcommand((s) => s.setName('image').setDescription('ارفع صورة/GIF الترحيب')
       .addAttachmentOption((o) => o.setName('file').setDescription('الملف (GIF أو صورة، حتى 10MB)').setRequired(true)))
@@ -416,6 +422,12 @@ async function handleWelcome(interaction) {
       return ephem(interaction, `✅ الاسم الظاهر في الرسالة صار: ${cfg.serverName}`);
     }
 
+    case 'dmimage': {
+      cfg.dmImageEnabled = interaction.options.getBoolean('enabled', true);
+      await setConfig(guild.id, cfg);
+      return ephem(interaction, `✅ صورة رسالة الخاص صارت ${cfg.dmImageEnabled ? 'مفعّلة (تجي مع الخاص)' : 'معطّلة (الخاص بدون صورة)'}.`);
+    }
+
     case 'toggle': {
       const target = interaction.options.getString('target', true);
       const enabled = interaction.options.getBoolean('enabled', true);
@@ -431,6 +443,7 @@ async function handleWelcome(interaction) {
         `⚙️ **إعدادات الترحيب — ${guild.name}**\n\n` +
         `• الحالة: ${cfg.welcomeEnabled ? 'مفعّل ✅' : 'معطّل ❌'}\n` +
         `• الخاص: ${cfg.dmEnabled ? 'مفعّل ✅' : 'معطّل ❌'}\n` +
+        `• صورة الخاص: ${cfg.dmImageEnabled !== false ? 'مفعّلة ✅' : 'معطّلة ❌'}\n` +
         `• القناة: ${ch ? `<#${ch.id}>` : 'تلقائي'}\n` +
         `• الاسم الظاهر: ${cfg.serverName}\n` +
         `• النص: \`${cfg.template}\`\n` +
@@ -453,7 +466,11 @@ async function handleWelcome(interaction) {
           embeds: [built.embed],
           files: [fileFor(cfg)]
         });
-        if (cfg.dmEnabled) await interaction.user.send({ content: built.dm, files: [fileFor(cfg)] }).catch(() => {});
+        if (cfg.dmEnabled) {
+          const dmPayload = { content: built.dm };
+          if (cfg.dmImageEnabled) dmPayload.files = [fileFor(cfg)];
+          await interaction.user.send(dmPayload).catch(() => {});
+        }
         return ephem(interaction, `✅ أرسلت ترحيب تجريبي في <#${channel.id}>.`);
       } catch (e) {
         return ephem(interaction, `❌ فشل الاختبار: ${e.message}`);
