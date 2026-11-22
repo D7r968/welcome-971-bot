@@ -4,7 +4,7 @@
     "template": "أهلاً بك {user} في سيرفر {server}!",
     "subtext": "نورتنا",
     "dm": "{user} تو ما نور السيرفر",
-    "color": "#FF8C00",
+    "color": "DC143C",
     "channelId": "1549392045196574731",
     "image": "welcome.gif",
     "welcomeEnabled": true,
