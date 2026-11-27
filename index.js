@@ -312,7 +312,7 @@ function buildCommands() {
     .setName('status')
     .setDescription('اعرض حالة البوت في الروم الصوتي');
 
-  return [welcome, join, leave, status].map((c) => c.toJSON());
+  return [welcome, join, leave, status].map((c) => c.setDefaultMemberPermissions(P.Administrator).toJSON());
 }
 
 async function registerCommands() {
@@ -570,6 +570,12 @@ client.once(Events.ClientReady, async (c) => {
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
+  // كل أوامر / مقتصرة على الأدمن (أي رتبة فيها صلاحية Administrator)
+  const allowed = interaction.member?.permissions?.has?.(PermissionFlagsBits.Administrator) ||
+    interaction.user.id === interaction.guild?.ownerId;
+  if (!allowed) {
+    return interaction.reply({ content: '❌ أوامر البوت للأدمن فقط.', flags: 64 });
+  }
   try {
     if (interaction.commandName === 'welcome') await handleWelcome(interaction);
     else await handleVoice(interaction);
